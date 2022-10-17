@@ -17,7 +17,7 @@ class NaverJisikExtractor :
 
     @classmethod
     def extract_data(cls):
-        cols = ['qus_title','qus_dir','qus_doc_id','qus_doc','qus_content','qus_answer']
+        cols = ['qus_title','qus_dir','qus_doc_id','qus_doc','qus_time','ans_time','qus_content','qus_answer']
         data = []
         for i in range(1,100):
             
@@ -42,6 +42,25 @@ class NaverJisikExtractor :
                     q_url = cls.BASE_URL[1] + qus_url
                     q_res = requests.get(q_url, headers = cls.HEADERS)
                     q_bs = BeautifulSoup(q_res.text, 'html.parser')
+                    # 질문시간
+
+                    qus_time = q_bs.find('div',{'class':'c-userinfo__left'}).find('span',{'class':'c-userinfo__info'}).text.replace('작성일','').replace('끌올 ','')
+                    if '분' in qus_time :
+                        rows.append(int(qus_time.replace('분 전','')))
+                    elif '시간' in qus_time :
+                        rows.append(int(qus_time.replace('시간 전',''))*60)
+                    else :
+                        rows.append(0)
+                    
+                    # 답변시간
+                    ans_time = q_bs.find('div',{'id':'answerArea'}).find('p',{'class':'c-heading-answer__content-date'}).text.replace('작성일','')
+    
+                    if '분' in ans_time :
+                        rows.append(int(ans_time.replace('분 전','')))
+                    elif '시간' in ans_time :
+                        rows.append(int(ans_time.replace('시간 전',''))*60)
+                    else :
+                        rows.append(0)
                     # 질문내용
                     try :
                         rows.append(q_bs.find('div',{'class':'c-heading__content'}).text.replace('\n','').replace('\t',''))
@@ -67,6 +86,7 @@ class NaverJisikExtractor :
                                 continue
                             else :
                                 temp_ls.append(p_content.replace('\u200b','').replace('\xa0',''))
+                        
                         rows.append(' '.join(temp_ls))
                         tmp = dict(zip(cols,rows))
                         data.append(tmp)
@@ -77,7 +97,7 @@ class NaverJisikExtractor :
                 'desc':'지식인 주관적 텍스트 추출',
                 'cols':{
                     'qus_title':'질문제목','qus_dir':'카테고리','qus_doc_id':'의사_고유번호','qus_doc':'의사이름',
-                    'qus_content':'질문내용','qus_answer':'답변'
+                    'qus_time':'질문시간', 'ans_time':'답변시간','qus_content':'질문내용','qus_answer':'답변'
                 },
                 'std_day':cal_std_day(0)
             },

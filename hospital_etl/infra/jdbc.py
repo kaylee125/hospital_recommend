@@ -4,19 +4,19 @@ JDBC Connect Info
 from infra.spark_session import get_spark_session
 from enum import Enum
 
-# class DataWareHouse(Enum):
-#     URL = 'jdbc:oracle:thin:@decorona_high?TNS_ADMIN=/home/big/study/db/Wallet_DECORONA'
-#     PROPS ={
-#         'user':'dw_de'
-#        ,'password':'123qwe!@#QWE'
-#     }
+class DataWareHouse(Enum):
+    URL = 'jdbc:oracle:thin:@hospital_high?TNS_ADMIN=/home/worker/project/db/Wallet_HOSPITAL'
+    PROPS ={
+        'user':'dw_hopital'
+       ,'password':'123qwe!@#QWE'
+    }
     
-# class DataMart(Enum):
-#     URL = 'jdbc:oracle:thin:@decorona_high?TNS_ADMIN=/home/big/study/db/Wallet_DECORONA'
-#     PROPS ={
-#         'user':'dm_de2'
-#        ,'password':'123qwe!@#QWE'
-#     }  
+class DataMart(Enum):
+    URL = 'jdbc:oracle:thin:@hospital_high?TNS_ADMIN=/home/worker/project/db/Wallet_HOSPITAL'
+    PROPS ={
+        'user':'dm_hopital'
+       ,'password':'123qwe!@#QWE'
+    }  
 
 
 def save_data(config, dataframe, table_name):
