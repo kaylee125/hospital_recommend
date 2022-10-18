@@ -1,0 +1,46 @@
+"""
+JDBC Connect Info
+"""
+from infra.spark_session import get_spark_session
+from enum import Enum
+
+# class DataWareHouse(Enum):
+#     URL = 'jdbc:oracle:thin:@decorona_high?TNS_ADMIN=/home/big/study/db/Wallet_DECORONA'
+#     PROPS ={
+#         'user':'dw_de'
+#        ,'password':'123qwe!@#QWE'
+#     }
+    
+# class DataMart(Enum):
+#     URL = 'jdbc:oracle:thin:@decorona_high?TNS_ADMIN=/home/big/study/db/Wallet_DECORONA'
+#     PROPS ={
+#         'user':'dm_de2'
+#        ,'password':'123qwe!@#QWE'
+#     }  
+
+
+def save_data(config, dataframe, table_name):
+    """
+    테이블에 dataframe객체를 저장한다. 테이블에 값이 있을 경우 뒤에 이어서 추가한다.
+    중복값이 생길 수 있으니 주의!!
+    """
+    dataframe.write.jdbc(url=config.URL.value
+    , table=table_name
+    , mode='append'
+    , properties=config.PROPS.value)
+
+def overwrite_data(config, dataframe, table_name):
+    """
+    mode가 overwrite라 테이블에 덮어씌워버린다.
+    사용시 주의할 것!!
+    """
+    dataframe.write.jdbc(url=config.URL.value
+    , table=table_name
+    , mode='overwrite'
+    , properties=config.PROPS.value)
+
+def find_data(config, table_name):
+    """
+    전달 받은 접속명, 테이블명에 접속하여 값을 반환해주는 함수 ex (DataWareHouse, 'LOC') --> 데이터웨어하우스라는 접속명의 테이블중 LOC라는 테이블 호출
+    """
+    return get_spark_session().read.jdbc(url=config.URL.value, table=table_name, properties=config.PROPS.value)
