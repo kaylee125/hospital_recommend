@@ -9,6 +9,10 @@ __license__ = "MIT"
 import sys
 
 from datajob.extract.naver_jisik import NaverJisikExtractor
+from datajob.transform.subjective_tf import SubjectiveTextTransformer
+from datajob.transform.objectiv_tf import ObjectiveTextTransformer
+from datajob.datamart.objective_each import ObjSymptom
+from infra.rawdata_upload import FileUpload
 
 
 
@@ -18,21 +22,31 @@ def extract_execute():
 
 # def extract_execute_monthly():
 
-# def transform_execute():
-
+def transform_execute():
+    SubjectiveTextTransformer.transform()
+    ObjectiveTextTransformer.transform()
 # def transform_execute_monthly():
 
+def local_upload():
+    FileUpload.upload()
 
 def main(extract_execute):
     works = {
-        'extract':{
+        'upload' : {
+            'hdfs_upload' : FileUpload.upload
+        }
+        , 'extract':{
             'execute_daily':extract_execute
             , 'naver_jisik': NaverJisikExtractor.extract_data
 
         }
         , 'transform':{
-            # 'execute_daily' : transform_execute
+            'subjective_tf': SubjectiveTextTransformer.transform
+            , 'objective_tf' : ObjectiveTextTransformer.transform
 
+        }
+        , 'save':{
+            'obj_sypmtom' : ObjSymptom.save
         }
 
     }

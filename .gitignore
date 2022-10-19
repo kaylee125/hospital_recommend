@@ -1,0 +1,5 @@
+## 폴더 무시
+rawdata_local/
+
+## py파일 무시
+rawdata_upload.py

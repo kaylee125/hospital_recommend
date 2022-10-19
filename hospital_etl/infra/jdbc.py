@@ -4,7 +4,7 @@ JDBC Connect Info
 from infra.spark_session import get_spark_session
 from enum import Enum
 
-class DataWareHouse(Enum):
+class DataWarehouse(Enum):
     URL = 'jdbc:oracle:thin:@hospital_high?TNS_ADMIN=/home/worker/project/db/Wallet_HOSPITAL'
     PROPS ={
         'user':'dw_hopital'

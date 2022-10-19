@@ -6,28 +6,30 @@ from pyspark.sql import Row
 
 class SubjectiveTextTransformer:
 
-
     @classmethod
     def transform(cls):
-        base_path= '/naver_jisik/'
-        params = 'qus_ans_' + cal_std_day(1)+'.json'
+        file_dir= '/naver_jisik/'
+        file_name = 'qus_ans_' + cal_std_day(0)+'.json'
+
         data = []
-        for param in params:
-            path = base_path + param     
-            sub_text_json = get_spark_session().read.json(path,encoding='UTF-8')
-            for r1 in sub_text_json.select(sub_text_json.data, sub_text_json.meta.std_day).toLocalIterator():
-                for r2 in r1.data:
-                    temp = r2.asDict()
-                    temp['std_day'] = r1['meta.std_day'] 
-                    data.append(Row(**temp))
+        path = file_dir + file_name     
+        sub_text_json = get_spark_session().read.json(path,encoding='UTF-8')
+        for r1 in sub_text_json.select(sub_text_json.data, sub_text_json.meta.std_day).toLocalIterator():
+            for r2 in r1.data:
+                temp = r2.asDict()
+                temp['std_day'] = r1['meta.std_day'] 
+                data.append(Row(**temp))
         sub_text_data = get_spark_session().createDataFrame(data)
         sub_text = sub_text_data.select(
-            sub_text_data.product_name.alias('PRODUCT_NAME').cast('string'),
-            sub_text_data.unit.alias('UNIT').cast('string'),
+            sub_text_data.qus_title.alias('QUS_TITLE').cast('string'),
+            sub_text_data.qus_dir.alias('QUS_DIR').cast('string'),
+            sub_text_data.qus_doc_id.alias('QUS_DOC_ID').cast('string'),
+            sub_text_data.qus_doc.alias('QUS_DOC').cast('string'),
+            sub_text_data.qus_time.alias('QUS_TIME').cast('int'),
+            sub_text_data.ans_time.alias('ANS_TIME').cast('int'),
+            sub_text_data.qus_content.alias('QUS_CONTENT').cast('string'),
+            sub_text_data.qus_answer.alias('QUS_ANSWER').cast('string'),
             sub_text_data.std_day.alias('STD_DAY').cast('string'),
-            sub_text_data.fluctuation_rate.alias('FLUCTUATION_RATE').cast('float'),
-            sub_text_data.is_rise.alias('IS_RISE').cast('int'),
-            sub_text_data.price.alias('PRICE').cast('float'),
-            sub_text_data.product_line.alias('PRODUCT_LINE').cast('string'),
-        ) 
-        save_data(DataWarehouse, fu_market, 'FUTURES_MARKET')
+        )
+        sub_text.show(5) 
+        save_data(DataWarehouse, sub_text, 'SUB_TEXT')
