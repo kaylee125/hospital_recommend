@@ -9,7 +9,7 @@ from pyspark.sql import Row, Column
     
 class ObjectiveTextTransformer:
     FILE_DIR = '/rawdata/'
-    FILE_NAME = ['dis_code.csv','gubun_dir.csv','objecitve_raw.csv','age_group.csv','clasfi_dis_code.csv','form.csv','sido.csv']
+    FILE_NAME = ['dis_code.csv','gubun_dir.csv','df_obj_short.csv','age_group.csv','clasfi_dis_code.csv','form.csv','sido.csv']
     TABLES = ['DISEASE_CODE','HOSPITAL_DEPARTMENT','OBJ_DATA','AGE_GROUP','CLASIFI_DIS_CODE','FORM','SIDO']
     @classmethod
     def transform(cls) :
@@ -81,11 +81,11 @@ class ObjectiveTextTransformer:
         
         spark_df = [code,gubun,objective,age_group,clasfi_dis_code,form,sido]
 
-        save_data(DataWarehouse,spark_df[0], cls.TABLES[0])
-        save_data(DataWarehouse,spark_df[1], cls.TABLES[1])
+        # save_data(DataWarehouse,spark_df[0], cls.TABLES[0])
+        # save_data(DataWarehouse,spark_df[1], cls.TABLES[1])
         save_data(DataWarehouse,spark_df[2].limit(int(spark_df[2].count())-1), cls.TABLES[2])
-        save_data(DataWarehouse,spark_df[3], cls.TABLES[3])
-        save_data(DataWarehouse,spark_df[4], cls.TABLES[4])
-        save_data(DataWarehouse,spark_df[5], cls.TABLES[5])
-        save_data(DataWarehouse,spark_df[6], cls.TABLES[6])
+        # save_data(DataWarehouse,spark_df[3], cls.TABLES[3])
+        # save_data(DataWarehouse,spark_df[4], cls.TABLES[4])
+        # save_data(DataWarehouse,spark_df[5], cls.TABLES[5])
+        # save_data(DataWarehouse,spark_df[6], cls.TABLES[6])
  

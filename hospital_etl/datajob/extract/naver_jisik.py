@@ -105,3 +105,4 @@ class NaverJisikExtractor :
         }
                     
         get_client().write(cls.FILE_DIR+cls.FILE_NAME,json.dumps(res,ensure_ascii=False),encoding='utf-8')
+        

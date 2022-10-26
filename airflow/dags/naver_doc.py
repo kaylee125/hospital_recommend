@@ -18,29 +18,24 @@ with DAG(
         'retries': 2,
         'retry_delay': timedelta(minutes=20),
     },
-    description='Subjective Text ETL',
-    schedule=timedelta(days=1),
+    description='New DOC EXTRACT',
+    schedule=timedelta(days=7),
     start_date=datetime(2022, 10, 16, 14, 30),
     catchup=False,
-    tags=['naver_etl'],
+    tags=['doc_etl'],
 ) as dag:
 
     # t1, t2 and t3 are examples of tasks created by instantiating operators
 
 
     t1 = BashOperator(
-        task_id='extract_naver_jisik',
+        task_id='extract_doc_list',
         cwd='/home/worker/project/hospital_etl',
-        bash_command='python3 main.py extract naver_jisik_ver_2',
+        bash_command='python3 main.py extract naver_doc',
         dag=dag
     )
 
-    t2 = BashOperator(
-        task_id='transform_subjective_text',
-        cwd='/home/worker/project/hospital_etl',
-        bash_command='python3 main.py transform subjective_tf',
-        dag=dag
-    )
+
 
 
 

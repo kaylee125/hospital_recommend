@@ -12,6 +12,11 @@ from datajob.extract.naver_jisik import NaverJisikExtractor
 from datajob.transform.subjective_tf import SubjectiveTextTransformer
 from datajob.transform.objectiv_tf import ObjectiveTextTransformer
 from datajob.datamart.objective_each import ObjSymptom
+from datajob.extract.naver_doc import DoctorInfoExtarctor
+from datajob.transform.naver_doc_tf import DocInfoTransformer
+from datajob.extract.naver_jisik_ver2 import NaverJisikExtractor2
+from datajob.datamart.qty_eachgwa import QtyEachDpt
+from datajob.datamart.answer_delay import AnswerDelay
 from infra.rawdata_upload import FileUpload
 
 
@@ -25,6 +30,7 @@ def extract_execute():
 def transform_execute():
     SubjectiveTextTransformer.transform()
     ObjectiveTextTransformer.transform()
+    
 # def transform_execute_monthly():
 
 def local_upload():
@@ -38,15 +44,20 @@ def main(extract_execute):
         , 'extract':{
             'execute_daily':extract_execute
             , 'naver_jisik': NaverJisikExtractor.extract_data
+            , 'naver_doc' : DoctorInfoExtarctor.extract_data
+            , 'naver_jisik_ver2': NaverJisikExtractor2.extract_data
 
         }
         , 'transform':{
             'subjective_tf': SubjectiveTextTransformer.transform
             , 'objective_tf' : ObjectiveTextTransformer.transform
+            , 'naver_doc_tf' : DocInfoTransformer.transform
 
         }
         , 'save':{
             'obj_sypmtom' : ObjSymptom.save
+            , 'qty_eachgwa' : QtyEachDpt.save
+            , 'answer_delay' : AnswerDelay.save
         }
 
     }

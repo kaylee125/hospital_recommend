@@ -31,5 +31,5 @@ class SubjectiveTextTransformer:
             sub_text_data.qus_answer.alias('QUS_ANSWER').cast('string'),
             sub_text_data.std_day.alias('STD_DAY').cast('string'),
         )
-        sub_text.show(5) 
-        save_data(DataWarehouse, sub_text, 'SUB_TEXT')
+
+        save_data(DataWarehouse, sub_text.limit(int(sub_text.count())-1), 'SUB_DATA')
