@@ -21,13 +21,14 @@ class DoctorInfoExtarctor:
         res = cls.__get_doc_info(doc_param)
         cls.__wright_to_hdfs(res)
 
+
+
+
+
+
     @classmethod
     def __wright_to_hdfs(cls, res):
         return get_client().write(cls.FILE_DIR+cls.FILE_NAME,json.dumps(res,ensure_ascii=False),encoding='utf-8')
-
-
-
-
 
 
     @classmethod

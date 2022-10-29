@@ -82,8 +82,8 @@ class ObjectiveTextTransformer:
         spark_df = [code,gubun,objective,age_group,clasfi_dis_code,form,sido]
 
         # save_data(DataWarehouse,spark_df[0], cls.TABLES[0])
-        # save_data(DataWarehouse,spark_df[1], cls.TABLES[1])
-        save_data(DataWarehouse,spark_df[2].limit(int(spark_df[2].count())-1), cls.TABLES[2])
+        save_data(DataWarehouse,spark_df[1], cls.TABLES[1])
+        # save_data(DataWarehouse,spark_df[2].limit(int(spark_df[2].count())-1), cls.TABLES[2])
         # save_data(DataWarehouse,spark_df[3], cls.TABLES[3])
         # save_data(DataWarehouse,spark_df[4], cls.TABLES[4])
         # save_data(DataWarehouse,spark_df[5], cls.TABLES[5])

@@ -7,8 +7,11 @@ __author__ = "Your Name"
 __version__ = "0.1.0"
 __license__ = "MIT"
 import sys
+from datajob.datamart.exact_dpt_answer import ExactDptAnswer
+from datajob.datamart.rec_dpt import RecDermaSave, RecENTSave, RecInternalMedicineSave, RecNeuroSave, RecORTSave, RecObstetricsSave, RecOphthalSave, RecUrologySave
 
 from datajob.extract.naver_jisik import NaverJisikExtractor
+from datajob.transform.find_no_symt_code_tf import FindNoSymtCode
 from datajob.transform.subjective_tf import SubjectiveTextTransformer
 from datajob.transform.objectiv_tf import ObjectiveTextTransformer
 from datajob.datamart.objective_each import ObjSymptom
@@ -17,6 +20,8 @@ from datajob.transform.naver_doc_tf import DocInfoTransformer
 from datajob.extract.naver_jisik_ver2 import NaverJisikExtractor2
 from datajob.datamart.qty_eachgwa import QtyEachDpt
 from datajob.datamart.answer_delay import AnswerDelay
+from datajob.transform.test1 import SubjectiveTextVer
+from datajob.transform.write_obj_symt import WriteObjSymtTransfomer
 from infra.rawdata_upload import FileUpload
 
 
@@ -52,12 +57,24 @@ def main(extract_execute):
             'subjective_tf': SubjectiveTextTransformer.transform
             , 'objective_tf' : ObjectiveTextTransformer.transform
             , 'naver_doc_tf' : DocInfoTransformer.transform
-
+            , 'find_no_symt_code_tf': FindNoSymtCode.transform
+            , 'write_obj_symt': WriteObjSymtTransfomer.transform
+            , 'test1': SubjectiveTextVer.transform
         }
         , 'save':{
             'obj_sypmtom' : ObjSymptom.save
             , 'qty_eachgwa' : QtyEachDpt.save
             , 'answer_delay' : AnswerDelay.save
+            , 'exact_dpt_answer' : ExactDptAnswer.save
+            , 'int_med_rec' : RecInternalMedicineSave.save
+            , 'ort_rec' : RecORTSave.save
+            , 'obstetrics_rec' : RecObstetricsSave.save
+            , 'derma_rec' : RecDermaSave.save
+            , 'ent_rec' :RecENTSave.save
+            , 'neuro_rec' : RecNeuroSave.save
+            , 'urology_rec' : RecUrologySave.save
+            , 'ophthal_rec' : RecOphthalSave.save
+            
         }
 
     }

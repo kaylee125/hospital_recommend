@@ -1,5 +1,9 @@
 ## 폴더 무시
 rawdata_local/
+hospital_rest/
+
 
 ## py파일 무시
 rawdata_upload.py
+
+test1.py

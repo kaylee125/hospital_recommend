@@ -7,7 +7,7 @@ from airflow import DAG
 # Operators; we need this to operate!
 from airflow.operators.bash import BashOperator
 with DAG(
-    'naver',
+    'naver_doc',
     # These args will get passed on to each operator
     # You can override them on a per-task basis during operator initialization
     default_args={
@@ -20,7 +20,7 @@ with DAG(
     },
     description='New DOC EXTRACT',
     schedule=timedelta(days=7),
-    start_date=datetime(2022, 10, 16, 14, 30),
+    start_date=datetime(2022, 10, 26, 9, 00),
     catchup=False,
     tags=['doc_etl'],
 ) as dag:
@@ -32,6 +32,13 @@ with DAG(
         task_id='extract_doc_list',
         cwd='/home/worker/project/hospital_etl',
         bash_command='python3 main.py extract naver_doc',
+        dag=dag
+    )
+
+    t2 = BashOperator(
+        task_id='append_doc_list',
+        cwd='/home/worker/project/hospital_etl',
+        bash_command='python3 main.py transform naver_doc_tf',
         dag=dag
     )
 

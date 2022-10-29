@@ -22,23 +22,41 @@ class NaverJisikExtractor2 :
     def extract_data(cls):
         cols = ['qus_title','qus_dir','qus_doc_id','qus_doc','qus_time','ans_time','qus_content','qus_answer']
         data = []
+        
+        # 데이터 크롤링
+        res = cls.__crawl_data(cols, data)
+    
+        cls.__write_to_hdfs(res)
 
-        for idx, param in enumerate(cls.doc_list['DOC_ID'][:20]):
 
+
+
+    @classmethod
+    def __write_to_hdfs(cls, res):
+        return get_client().write(cls.FILE_DIR+cls.FILE_NAME,json.dumps(res,ensure_ascii=False),encoding='utf-8')
+
+    @classmethod
+    def __crawl_data(cls, cols, data):
+        for idx, param in enumerate(cls.doc_list['DOC_ID']):
             url = cls.BASE_URL[0] + param
             res = requests.get(url, headers = cls.HEADERS)
             bs = BeautifulSoup(res.text, 'html.parser')
             #오늘의 답변 개수
-            qus_qty = int(bs.find('div',{'id':'content'}).findAll('dd')[2].text)
+            # 전문가가 탈퇴 했을 경우
+            try :
+                qus_qty = int(bs.find('div',{'id':'content'}).findAll('dd')[2].text)
+            except:
+                qus_qty = 0
             if str(qus_qty) == '0' : 
                 pass
             else :
                 #오늘의 답변으로 보는 페이지개수
                 qus_page =  int(qus_qty/20)+1
                 for page in range(1,qus_page+1) :
-                    url = url + 'page=' + str(page)
+                    url = url + '&page=' + str(page)
                     res = requests.get(url, headers = cls.HEADERS)
                     bs = BeautifulSoup(res.text, 'html.parser')
+
                     trs = bs.find('tbody',{'id':'au_board_list'}).findAll('tr')
                     for tr in trs :
                         rows =[] 
@@ -57,54 +75,62 @@ class NaverJisikExtractor2 :
                             q_res = requests.get(q_url, headers = cls.HEADERS)
                             q_bs = BeautifulSoup(q_res.text, 'html.parser')
                             # 질문시간
-                    
-                            qus_time = q_bs.find('div',{'class':'c-userinfo__left'}).find('span',{'class':'c-userinfo__info'}).text.replace('작성일','').replace('끌올 ','')
-                            if '분' in qus_time :
-                                rows.append(int(qus_time.replace('분 전','')))
-                            elif '시간' in qus_time :
-                                rows.append(int(qus_time.replace('시간 전',''))*60)
-                            else :
-                                rows.append(0)
-                            
-                            # 답변시간
-                            ans_time = q_bs.find('div',{'id':'answerArea'}).find('p',{'class':'c-heading-answer__content-date'}).text.replace('작성일','')
-            
-                            if '분' in ans_time :
-                                rows.append(int(ans_time.replace('분 전','')))
-                            elif '시간' in ans_time :
-                                rows.append(int(ans_time.replace('시간 전',''))*60)
-                            else :
-                                rows.append(0)
-                            # 질문내용
+                            # 게시물이 비공개처리된경우
                             try :
-                                rows.append(q_bs.find('div',{'class':'c-heading__content'}).text.replace('\n','').replace('\t',''))
-                            except :
-                                rows.append('No Content')
-                            temp_ls = []
-                            ps = q_bs.find('div',{'class':'se-main-container'})
-                            ps_1 = q_bs.find('div',{'class':'_endContentsText c-heading-answer__content-user'})
-                            try:
-                                for p in ps.findAll('p'):
-                                    p_content = p.find('span').text
-                                    if p_content == ' ' :
-                                        continue
-                                    else :
-                                        temp_ls.append(p_content.replace('\u200b','').replace('\xa0',''))
-                                rows.append(' '.join(temp_ls))
-                                tmp = dict(zip(cols,rows))
-                                data.append(tmp)
-                            except :
-                                for p in ps_1.findAll('p'):
-                                    p_content = p.text
-                                    if p_content == ' ' :
-                                        continue
-                                    else :
-                                        temp_ls.append(p_content.replace('\u200b','').replace('\xa0',''))
+                                print(q_url)
+                                qus_time = q_bs.find('div',{'class':'c-userinfo__left'}).find('span',{'class':'c-userinfo__info'}).text.replace('작성일','').replace('끌올 ','')
+                                if '분' in qus_time :
+                                    rows.append(int(qus_time.replace('분 전','')))
+                                elif '시간' in qus_time :
+                                    rows.append(int(qus_time.replace('시간 전',''))*60)
+                                else :
+                                    rows.append(0)
                                 
-                                rows.append(' '.join(temp_ls))
-                                tmp = dict(zip(cols,rows))
-                                data.append(tmp)
-        print(data)
+                                # 답변시간
+                                ans_time = q_bs.find('div',{'id':'answerArea'}).find('p',{'class':'c-heading-answer__content-date'}).text.replace('작성일','')
+                
+                                if '분' in ans_time :
+                                    rows.append(int(ans_time.replace('분 전','')))
+                                elif '시간' in ans_time :
+                                    rows.append(int(ans_time.replace('시간 전',''))*60)
+                                else :
+                                    rows.append(0)
+                                # 질문내용
+                                try :
+                                    rows.append(q_bs.find('div',{'class':'c-heading__content'}.text.replace('\n','').replace('\t','')))
+                                except :
+                                    rows.append('No Content')
+                                print(rows)
+                                temp_ls = []
+                                ps = q_bs.find('div',{'class':'se-main-container'})
+                                ps_1 = q_bs.find('div',{'class':'_endContentsText c-heading-answer__content-user'})
+                                try:
+                                    for p in ps.findAll('p'):
+                                        p_content = p.find('span').text
+                                        if p_content == ' ' :
+                                            continue
+                                        else :
+                                            temp_ls.append(p_content.replace('\u200b','').replace('\xa0',''))
+                                    rows.append(' '.join(temp_ls))
+                                    tmp = dict(zip(cols,rows))
+                                    data.append(tmp)
+                                except :
+                                    for p in ps_1.findAll('p'):
+                                        p_content = p.text
+                                        if p_content == ' ' :
+                                            continue
+                                        else :
+                                            temp_ls.append(p_content.replace('\u200b','').replace('\xa0',''))
+                                    
+                                    rows.append(' '.join(temp_ls))
+                                    tmp = dict(zip(cols,rows))
+                                    data.append(tmp)
+                            except:
+                                rows.append(0)
+                                rows.append(0)
+                                rows.append("비공개 처리된 게시물")
+
+
         res = {
             'meta':{
                 'desc':'지식인 주관적 텍스트 추출',
@@ -116,5 +142,5 @@ class NaverJisikExtractor2 :
             },
             'data':data
         }
-
-        get_client().write(cls.FILE_DIR+cls.FILE_NAME,json.dumps(res,ensure_ascii=False),encoding='utf-8')
+        
+        return res

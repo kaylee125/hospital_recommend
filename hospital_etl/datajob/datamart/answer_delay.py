@@ -13,7 +13,7 @@ class AnswerDelay:
                                         (cls.sub_data.ANS_TIME.isNotNull()))    
                                         
         df_delay = df_sub.select((avg(df_sub.QUS_TIME)-avg(df_sub.ANS_TIME)).alias('DELAY_M'))
-        df_delay = df_delay.withColumn('STD_DAY',date_add(current_date(), -1))
+        df_delay = df_delay.withColumn('STD_DAY',date_add(current_date(), -0))
         df_delay = df_delay.select(
             df_delay.DELAY_M.cast('float'),
             df_delay.STD_DAY.cast('string')
